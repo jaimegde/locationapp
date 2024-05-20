@@ -54,6 +54,7 @@ fun MyApp(viewModel: LocationViewModel){
 
 @Composable
 fun LocationDisplay(locationUtils: LocationUtils, context: Context, viewModel: LocationViewModel) {
+    val location = viewModel.location.value
 
     val requestPermissionLauncher =
         rememberLauncherForActivityResult(
@@ -63,7 +64,8 @@ fun LocationDisplay(locationUtils: LocationUtils, context: Context, viewModel: L
                     &&
                     permissions[Manifest.permission.ACCESS_COARSE_LOCATION] == true
                 ) {
-                    //Location successfull
+                    //Location successful
+                    locationUtils.requestLocationUpdates(viewModel)
 
                 } else {
                     val rationaleRequired = ActivityCompat.shouldShowRequestPermissionRationale(
@@ -87,11 +89,17 @@ fun LocationDisplay(locationUtils: LocationUtils, context: Context, viewModel: L
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center
             ) {
-                Text("Location not available")
+                if(location != null){
+                    Text("Address: ${location.latitude} ${location.longitude}")
+                } else {
+                    Text("Location not available")
+                }
+
 
                 Button(onClick = {
                     if (locationUtils.hasLocationPermission(context)) {
                         //Permission already granted, update location
+                        locationUtils.requestLocationUpdates(viewModel)
 
                     } else {
                         //Request location permission
